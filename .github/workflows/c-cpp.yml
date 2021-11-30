@@ -9,12 +9,16 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-20.04
-
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        CXX: [g++-11, g++-12, clang++-13, clang++-14]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: install env
-      run: sudo apt install g++-11
+      run: echo ''#sudo apt install g++-11
     - name: make
       run: make
+      env:
+        CXX: ${{ matrix.CXX }}
 
