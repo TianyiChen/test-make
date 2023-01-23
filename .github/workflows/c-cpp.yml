@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: install env
-      run: echo ''#sudo apt install g++-11
+      run: wget https://github.com/nlohmann/json/releases/download/v3.11.2/json.hpp
     - name: make
       run: make
       env:
