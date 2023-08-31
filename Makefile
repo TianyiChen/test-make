@@ -3,4 +3,4 @@ ifneq (,$(findstring clang,$(CXX)))
 CPP := $(CPP) -stdlib=libc++
 endif
 test:
-	$(CPP) hello.cpp -o hello
+	$(CPP) hello.cpp -o hello -lstdc++
