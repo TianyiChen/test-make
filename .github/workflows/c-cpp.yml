@@ -19,7 +19,7 @@ jobs:
       run: |
         wget --no-check-certificate -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
         sudo add-apt-repository 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main'
-        sudo apt install ${{CXX}} ${{ fromJson('{ "clang-13": "libc++-13-dev libc++abi-13-dev", "clang-14": "libc++-14-dev libc++abi-14-dev" }')[CXX] }}
+        sudo apt install ${{matrix.CXX}} ${{ fromJson('{ "clang-13": "libc++-13-dev libc++abi-13-dev", "clang-14": "libc++-14-dev libc++abi-14-dev" }')[matrix.CXX] }}
     - name: make
       run: make
       env:
