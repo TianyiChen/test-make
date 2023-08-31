@@ -25,4 +25,8 @@ jobs:
       env:
         CXX: ${{ matrix.CXX }}
     - name: run
-      run: ./hello
+      run: ./hello > hello.log
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ${{matrix.CXX}}.log
+        path: hello.log
