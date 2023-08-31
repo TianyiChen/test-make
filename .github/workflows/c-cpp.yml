@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        CXX: [g++-11, g++-12, g++-13, clang-15, clang-16]
+        CXX: [g++-11, g++-12, g++-13, clang-15, clang-14]
     steps:
     - uses: actions/checkout@v3
     - name: install env
       run: |
         wget --no-check-certificate -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
         sudo add-apt-repository 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main'
-        sudo apt install ${{matrix.CXX}} ${{ fromJson('{ "clang-15": "libc++-15-dev libc++abi-15-dev", "clang-16": "libc++-16-dev libc++abi-16-dev" }')[matrix.CXX] }}
+        sudo apt install ${{matrix.CXX}} ${{ fromJson('{ "clang-15": "libc++-15-dev libc++abi-15-dev", "clang-14": "libc++-14-dev libc++abi-14-dev" }')[matrix.CXX] }}
     - name: make
       run: make
       env:
