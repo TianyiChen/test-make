@@ -4,7 +4,7 @@ on:
   push:
     branches: [ '*' ]
   pull_request:
-    branches: [ main ]
+    branches: [ ]
 
 jobs:
   build:
@@ -12,13 +12,21 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        CXX: [g++-11, g++-12, clang++-13, clang++-14]
+        CXX: [g++-11, g++-12, g++-13, clang-15, clang-14]
     steps:
     - uses: actions/checkout@v3
     - name: install env
-      run: echo ''#sudo apt install g++-11
+      run: |
+        wget --no-check-certificate -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        sudo add-apt-repository 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main'
+        sudo apt install ${{matrix.CXX}} ${{ fromJson('{ "clang-15": "libc++-15-dev libc++abi-15-dev", "clang-14": "libc++-14-dev libc++abi-14-dev" }')[matrix.CXX] }}
     - name: make
       run: make
       env:
         CXX: ${{ matrix.CXX }}
-
+    - name: run
+      run: ./hello > hello.log
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ${{matrix.CXX}}.log
+        path: hello.log
