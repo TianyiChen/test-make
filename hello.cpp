@@ -19,20 +19,31 @@ struct TS {
   auto operator<=>(const TS& o) const {
     return v.tv_sec != o.v.tv_sec ? v.tv_sec <=> o.v.tv_sec : v.tv_nsec <=> o.v.tv_nsec;
   }
+  TS& from_midnight() {
+    v.tv_sec %= 86400;
+    return *this;
+  }
 };
 int main() {
-  int  cnt1 = 0, cnt2 = 0;
-  auto start = chrono::system_clock::now();
-  for(;;) {
-    auto now = chrono::system_clock::now();
-    if(now - start >= 1s) break;
-    ++cnt1;
+  int cnt1 = 0, cnt2 = 0;
+  {
+    auto start = chrono::system_clock::now();
+    auto end   = start - chrono::floor<chrono::days>(start) + 1s;
+    for(;;) {
+      auto now = chrono::system_clock::now();
+      if(now - chrono::floor<chrono::days>(now) >= end) break;
+      ++cnt1;
+    }
   }
-  auto start2 = TS::now();
-  for(;;) {
-    auto now = TS::now();
-    if(now - start2 >= TS{1, 0}) break;
-    ++cnt2;
+  {
+    auto start = TS::now().from_midnight();
+    auto end   = start;
+    end.v.tv_sec += 1;
+    for(;;) {
+      auto now = TS::now().from_midnight();
+      if(now >= end) break;
+      ++cnt2;
+    }
   }
   cout << cnt1 << ' ' << cnt2 << endl;
 }
