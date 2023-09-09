@@ -7,9 +7,9 @@ struct TS {
   timespec v;
   static_assert(is_signed_v<decltype(v.tv_nsec)>);
   static TS now() {
-    timespec r;
-    clock_gettime(CLOCK_REALTIME, &r);
-    return {r};
+    TS r;
+    clock_gettime(CLOCK_REALTIME, &r.v);
+    return r;
   }
   TS operator-(const TS& o) const {
     TS rt{v.tv_sec - o.v.tv_sec, v.tv_nsec - o.v.tv_nsec};
