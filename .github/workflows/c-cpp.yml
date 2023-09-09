@@ -25,8 +25,4 @@ jobs:
       env:
         CXX: ${{ matrix.CXX }}
     - name: run
-      run: ./hello | tee hello.log
-    - uses: actions/upload-artifact@v3
-      with:
-        name: ${{matrix.CXX}}.log
-        path: hello.log
+      run: ./hello >> $GITHUB_STEP_SUMMARY
