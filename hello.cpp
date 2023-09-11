@@ -28,6 +28,11 @@ struct TS {
 auto operator<=>(const timespec& a, const timespec& b) {
   return a.tv_sec != b.tv_sec ? a.tv_sec <=> b.tv_sec : a.tv_nsec <=> b.tv_nsec;
 }
+auto get_timespec() {
+  timespec rt;
+  timespec_get(&rt, TIME_UTC);
+  return rt;
+}
 int main() {
   int  cnt1 = 0, cnt2 = 0;
   tm   midnight{};
@@ -48,14 +53,12 @@ int main() {
     }
   }
   {
-    timespec start;
-    timespec_get(&start, TIME_UTC);
-    auto end = start;
+    auto start = get_timespec();
+    auto end   = start;
     end.tv_sec -= midnight_timestamp;
     end.tv_sec += 1;
     for(;;) {
-      timespec now;
-      timespec_get(&now, TIME_UTC);
+      auto now = get_timespec();
       now.tv_sec -= midnight_timestamp;
       if(now >= end) break;
       ++cnt2;
