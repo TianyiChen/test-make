@@ -24,8 +24,20 @@ struct TS {
     return *this;
   }
 };
+
+auto operator<=>(const timespec& a, const timespec& b) {
+  return a.tv_sec != b.tv_sec ? a.tv_sec <=> b.tv_sec : a.tv_nsec <=> b.tv_nsec;
+}
 int main() {
-  int cnt1 = 0, cnt2 = 0;
+  int  cnt1 = 0, cnt2 = 0;
+  tm   midnight{};
+  auto t = time(0);
+  localtime_r(&t, &midnight);
+  midnight.tm_hour          = 0;
+  midnight.tm_min           = 0;
+  midnight.tm_sec           = 0;
+  time_t midnight_timestamp = mktime(&midnight);
+  cout << midnight_timestamp << endl;
   {
     auto start = chrono::system_clock::now();
     auto end   = start - chrono::floor<chrono::days>(start) + 1s;
@@ -36,11 +48,15 @@ int main() {
     }
   }
   {
-    auto start = TS::now().from_midnight();
-    auto end   = start;
-    end.v.tv_sec += 1;
+    timespec start;
+    timespec_get(&start, TIME_UTC);
+    auto end = start;
+    end.tv_sec -= midnight_timestamp;
+    end.tv_sec += 1;
     for(;;) {
-      auto now = TS::now().from_midnight();
+      timespec now;
+      timespec_get(&now, TIME_UTC);
+      now.tv_sec -= midnight_timestamp;
       if(now >= end) break;
       ++cnt2;
     }
