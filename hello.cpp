@@ -28,19 +28,12 @@ struct TS {
 auto operator<=>(const timespec& a, const timespec& b) {
   return a.tv_sec != b.tv_sec ? a.tv_sec <=> b.tv_sec : a.tv_nsec <=> b.tv_nsec;
 }
-auto get_timespec() {
+auto get_timespec_local_day() {
   timespec rt;
   timespec_get(&rt, TIME_UTC);
+  rt.tv_sec -= 5 * 3600;
+  rt.tv_sec %= 3600;
   return rt;
-}
-time_t midnight_timestamp() {
-  auto t = time(0);
-  tm   midnight;
-  localtime_r(&t, &midnight);
-  midnight.tm_hour = 0;
-  midnight.tm_min  = 0;
-  midnight.tm_sec  = 0;
-  return mktime(&midnight);
 }
 int main() {
   int cnt1 = 0, cnt2 = 0;
@@ -54,13 +47,11 @@ int main() {
     }
   }
   {
-    auto start = get_timespec();
+    auto start = get_timespec_local_day();
     auto end   = start;
-    end.tv_sec -= midnight_timestamp();
     end.tv_sec += 1;
     for(;;) {
-      auto now = get_timespec();
-      now.tv_sec -= midnight_timestamp();
+      auto now = get_timespec_local_day();
       if(now >= end) break;
       ++cnt2;
     }
