@@ -44,7 +44,7 @@ void format1(ofstream& o) {
   std::strftime(std::data(timeString), std::size(timeString), "%F %T", localtime(&t.tv_sec));
   o << timeString << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
 }
-inline void pad2(ofstream& o, int num) {
+void pad2(ofstream& o, int num) {
   if(num < 10) o << '0';
   o << num;
 }

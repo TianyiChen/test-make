@@ -1,4 +1,4 @@
-CPP= $(CXX) -std=c++20 -O2
+CPP= $(CXX) -std=c++20 -O2 -march=native
 ifneq (,$(findstring clang,$(CXX)))
 CPP := $(CPP) -stdlib=libc++
 endif
