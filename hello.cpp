@@ -1,6 +1,9 @@
 #include <chrono>
 #include <cstdio>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
+
 #include <vector>
 using namespace std;
 struct TS {
@@ -35,14 +38,43 @@ auto get_timespec_local_day() {
   rt.tv_sec %= 3600;
   return rt;
 }
+void format1(ofstream& o) {
+  auto t = get_timespec_local_day();
+  char timeString[std::size("yyyy-mm-dd hh:mm:ss")];
+  std::strftime(std::data(timeString), std::size(timeString), "%F %T", localtime(&t.tv_sec));
+  o << timeString << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
+}
+void pad2(ofstream& o, int num) {
+  if(num < 10) o << '0';
+  o << num;
+}
+void format2(ofstream& o) {
+  auto t = get_timespec_local_day();
+  char timeString[std::size("yyyy-mm-dd hh:mm:ss")];
+  tm   l;
+  localtime_r(&t.tv_sec, &l);
+  o << (l.tm_year + 1900) << '-';
+  if(l.tm_mon < 9) o << '0';
+  o << l.tm_mon + 1 << '-';
+  pad2(o, l.tm_mday);
+  o << ' ';
+  pad2(o, l.tm_hour);
+  o << ':';
+  pad2(o, l.tm_min);
+  o << ':';
+  pad2(o, l.tm_sec);
+  o << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
+}
 int main() {
-  int cnt1 = 0, cnt2 = 0;
+  int      cnt1 = 0, cnt2 = 0;
+  ofstream o("/dev/null");
   {
     auto start = chrono::system_clock::now();
     auto end   = start - chrono::floor<chrono::days>(start) + 1s;
     for(;;) {
       auto now = chrono::system_clock::now();
       if(now - chrono::floor<chrono::days>(now) >= end) break;
+      format1(o);
       ++cnt1;
     }
   }
@@ -53,6 +85,7 @@ int main() {
     for(;;) {
       auto now = get_timespec_local_day();
       if(now >= end) break;
+      format2(o);
       ++cnt2;
     }
   }
