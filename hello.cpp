@@ -33,16 +33,17 @@ auto get_timespec() {
   timespec_get(&rt, TIME_UTC);
   return rt;
 }
-int main() {
-  int  cnt1 = 0, cnt2 = 0;
-  tm   midnight{};
+time_t midnight_timestamp() {
   auto t = time(0);
+  tm   midnight;
   localtime_r(&t, &midnight);
-  midnight.tm_hour          = 0;
-  midnight.tm_min           = 0;
-  midnight.tm_sec           = 0;
-  time_t midnight_timestamp = mktime(&midnight);
-  cout << midnight_timestamp << endl;
+  midnight.tm_hour = 0;
+  midnight.tm_min  = 0;
+  midnight.tm_sec  = 0;
+  return mktime(&midnight);
+}
+int main() {
+  int cnt1 = 0, cnt2 = 0;
   {
     auto start = chrono::system_clock::now();
     auto end   = start - chrono::floor<chrono::days>(start) + 1s;
@@ -55,11 +56,11 @@ int main() {
   {
     auto start = get_timespec();
     auto end   = start;
-    end.tv_sec -= midnight_timestamp;
+    end.tv_sec -= midnight_timestamp();
     end.tv_sec += 1;
     for(;;) {
       auto now = get_timespec();
-      now.tv_sec -= midnight_timestamp;
+      now.tv_sec -= midnight_timestamp();
       if(now >= end) break;
       ++cnt2;
     }
