@@ -35,25 +35,29 @@ int get_timezone_offset_s() {
   time_t t = time(NULL);
   tm     lt;
   localtime_r(&t, &lt);
-  cerr << "is_dst" << lt.tm_isdst << endl;
   return lt.tm_gmtoff;
 }
-auto get_timespec_local_day() {
+auto get_timespec_local() {
   timespec rt;
   timespec_get(&rt, TIME_UTC);
-  rt.tv_sec -= 5 * 3600;
-  rt.tv_sec %= 3600;
+  static int tz_offset = get_timezone_offset_s();
+  rt.tv_sec += tz_offset;
   return rt;
 }
+auto get_timespec_local_day() {
+  auto r = get_timespec_local();
+  r.tv_sec %= 86400;
+  return r;
+}
 void format1(ofstream& o) {
-  auto t = get_timespec_local_day();
+  auto t = get_timespec_local();
   char timeString[std::size("yyyy-mm-dd hh:mm:ss")];
   std::strftime(std::data(timeString), std::size(timeString), "%F %T", localtime(&t.tv_sec));
   o << timeString << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
 }
 void pad2(ofstream& o, int num) { o << char(num / 10 + '0') << char(num % 10 + '0'); }
 void format2(ofstream& o) {
-  auto t = get_timespec_local_day();
+  auto t = get_timespec_local();
   tm   l;
   localtime_r(&t.tv_sec, &l);
   o << (l.tm_year + 1900) << '-';
