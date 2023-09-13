@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 
 #include <vector>
 using namespace std;
@@ -52,28 +53,36 @@ auto get_timespec_local_day() {
 void format1(ofstream& o) {
   auto t = get_timespec_local();
   char timeString[std::size("yyyy-mm-dd hh:mm:ss")];
-  std::strftime(std::data(timeString), std::size(timeString), "%F %T", localtime(&t.tv_sec));
+  std::strftime(std::data(timeString), std::size(timeString), "%F %T", gmtime(&t.tv_sec));
   o << timeString << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
 }
-void pad2(ofstream& o, int num) { o << char(num / 10 + '0') << char(num % 10 + '0'); }
-void format2(ofstream& o) {
+void format2(ostream& o) {
   auto t = get_timespec_local();
   tm   l;
-  localtime_r(&t.tv_sec, &l);
+  gmtime_r(&t.tv_sec, &l);
   o << (l.tm_year + 1900) << '-';
-  if(l.tm_mon < 9) o << '0';
-  o << l.tm_mon + 1 << '-';
-  pad2(o, l.tm_mday);
-  o << ' ';
-  pad2(o, l.tm_hour);
-  o << ':';
-  pad2(o, l.tm_min);
-  o << ':';
-  pad2(o, l.tm_sec);
-  o << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
+  char       buf[std::size("01-02 12:34:56.123456789")], *p = buf;
+  const auto pad2 = [&](int num) {
+    *p++ = num / 10 + '0';
+    *p++ = num % 10 + '0';
+  };
+  pad2(l.tm_mon + 1);
+  *p++ = '-';
+  pad2(l.tm_mday);
+  *p++ = ' ';
+  pad2(l.tm_hour);
+  *p++ = ':';
+  pad2(l.tm_min);
+  *p++ = ':';
+  pad2(l.tm_sec);
+  *p++ = '.';
+  o << string_view{buf, p} << std::setfill('0') << std::setw(9) << t.tv_nsec;
 }
 int main() {
   cerr << get_timezone_offset_s() << endl;
+  stringstream s;
+  format2(s);
+  cerr << s.str() << endl;
   int      cnt1 = 0, cnt2 = 0;
   ofstream o("/dev/null");
   {
