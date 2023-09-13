@@ -78,7 +78,10 @@ void format2(ostream& o) {
   *p++ = ':';
   pad2(l.tm_sec);
   *p++ = '.';
-  o << string_view{buf, p} << std::setfill('0') << std::setw(9) << t.tv_nsec;
+  for(char* q = p + 8; q >= p; t.tv_nsec /= 10) {
+    *q-- = t.tv_nsec % 10 + '0';
+  }
+  o << string_view{buf, end(buf)};
 }
 int main() {
   cerr << get_timezone_offset_s() << endl;
