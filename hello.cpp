@@ -44,10 +44,7 @@ void format1(ofstream& o) {
   std::strftime(std::data(timeString), std::size(timeString), "%F %T", localtime(&t.tv_sec));
   o << timeString << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
 }
-void pad2(ofstream& o, int num) {
-  if(num < 10) o << '0';
-  o << num;
-}
+void pad2(ofstream& o, int num) { o << char(num / 10 + '0') << char(num % 10 + '0'); }
 void format2(ofstream& o) {
   auto t = get_timespec_local_day();
   tm   l;
