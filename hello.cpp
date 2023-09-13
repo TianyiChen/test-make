@@ -97,5 +97,5 @@ int main() {
       ++cnt2;
     }
   }
-  cout << cnt1 << ' ' << cnt2 << endl;
+  cout << cnt1 << ' ' << cnt2 << ' ' << double(cnt2) / cnt1 << endl;
 }
