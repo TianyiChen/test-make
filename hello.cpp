@@ -60,12 +60,14 @@ void format2(ostream& o) {
   auto t = get_timespec_local();
   tm   l;
   gmtime_r(&t.tv_sec, &l);
-  o << (l.tm_year + 1900) << '-';
-  char       buf[std::size("01-02 12:34:56.123456789")], *p = buf;
+  o << "20";
+  char       buf[std::size("13-01-02 12:34:56.123456789")], *p = buf;
   const auto pad2 = [&](int num) {
     *p++ = num / 10 + '0';
     *p++ = num % 10 + '0';
   };
+  pad2(l.tm_year - 100);
+  *p++ = '-';
   pad2(l.tm_mon + 1);
   *p++ = '-';
   pad2(l.tm_mday);
