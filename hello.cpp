@@ -50,7 +50,7 @@ auto get_timespec_local_day() {
   r.tv_sec %= 86400;
   return r;
 }
-void format1(ofstream& o) {
+void format1(ostream& o) {
   auto t = get_timespec_local();
   char timeString[std::size("yyyy-mm-dd hh:mm:ss")];
   std::strftime(std::data(timeString), std::size(timeString), "%F %T", gmtime(&t.tv_sec));
@@ -81,16 +81,19 @@ void format2(ostream& o) {
 int main() {
   cerr << get_timezone_offset_s() << endl;
   stringstream s;
+  format1(s);
+  s << '\n';
   format2(s);
   cerr << s.str() << endl;
   int      cnt1 = 0, cnt2 = 0;
   ofstream o("/dev/null");
   {
-    auto start = chrono::system_clock::now();
-    auto end   = start - chrono::floor<chrono::days>(start) + 1s;
+    auto start = get_timespec_local_day();
+    auto end   = start;
+    end.tv_sec += 1;
     for(;;) {
-      auto now = chrono::system_clock::now();
-      if(now - chrono::floor<chrono::days>(now) >= end) break;
+      auto now = get_timespec_local_day();
+      if(now >= end) break;
       format1(o);
       ++cnt1;
     }
