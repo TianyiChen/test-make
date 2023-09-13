@@ -41,6 +41,7 @@ int get_timezone_offset_s() {
 auto get_timespec_local() {
   timespec rt;
   timespec_get(&rt, TIME_UTC);
+  // assumes timezone doesn't change while the program is running
   static int tz_offset = get_timezone_offset_s();
   rt.tv_sec += tz_offset;
   return rt;
@@ -50,17 +51,15 @@ auto get_timespec_local_day() {
   r.tv_sec %= 86400;
   return r;
 }
-void format1(ostream& o) {
-  auto t = get_timespec_local();
+void format1(ostream& o, timespec t = get_timespec_local()) {
   char timeString[std::size("yyyy-mm-dd hh:mm:ss")];
   std::strftime(std::data(timeString), std::size(timeString), "%F %T", gmtime(&t.tv_sec));
   o << timeString << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
 }
-void format2(ostream& o) {
-  auto t = get_timespec_local();
-  tm   l;
+void format2(ostream& o, timespec t = get_timespec_local()) {
+  tm l;
   gmtime_r(&t.tv_sec, &l);
-  o << "20";
+  o << "20";  // 2000-2099
   char       buf[std::size("13-01-02 12:34:56.123456789")], *p = buf;
   const auto pad2 = [&](int num) {
     *p++ = num / 10 + '0';
