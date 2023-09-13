@@ -31,6 +31,13 @@ struct TS {
 auto operator<=>(const timespec& a, const timespec& b) {
   return a.tv_sec != b.tv_sec ? a.tv_sec <=> b.tv_sec : a.tv_nsec <=> b.tv_nsec;
 }
+int get_timezone_offset_s() {
+  time_t t = time(NULL);
+  tm     lt;
+  localtime_r(&t, &lt);
+  cerr << "is_dst" << lt.tm_isdst << endl;
+  return lt.tm_gmtoff;
+}
 auto get_timespec_local_day() {
   timespec rt;
   timespec_get(&rt, TIME_UTC);
@@ -62,6 +69,7 @@ void format2(ofstream& o) {
   o << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
 }
 int main() {
+  cerr << get_timezone_offset_s() << endl;
   int      cnt1 = 0, cnt2 = 0;
   ofstream o("/dev/null");
   {
