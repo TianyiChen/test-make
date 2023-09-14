@@ -52,14 +52,14 @@ auto get_timespec_local_day() {
   return r;
 }
 void format1(ostream& o, timespec t = get_timespec_local()) {
-  char timeString[std::size("yyyy-mm-dd hh:mm:ss")];
-  std::strftime(std::data(timeString), std::size(timeString), "%F %T", gmtime(&t.tv_sec));
+  char timeString[std::size("yy-mm-dd hh:mm:ss")];
+  std::strftime(std::data(timeString), std::size(timeString), "%y-%m-%d %T", gmtime(&t.tv_sec));
   o << timeString << '.' << std::setfill('0') << std::setw(9) << t.tv_nsec;
 }
 void format2(ostream& o, timespec t = get_timespec_local()) {
   tm l;
   gmtime_r(&t.tv_sec, &l);
-  o << "20";  // 2000-2099
+  // 2000-2099
   char       buf[std::size("13-01-02 12:34:56.123456789")], *p = buf;
   const auto pad2 = [&](int num) {
     *p++ = num / 10 + '0';
